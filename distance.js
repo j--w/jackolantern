@@ -1,30 +1,56 @@
-const Gpio = require('pigpio').Gpio;
+const { Gpio } =
+  process.env.NODE_ENV !== "production"
+    ? require("./mock-gpio")
+    : require("pigpio");
+const EventEmitter = require("events");
 
-// The number of microseconds it takes sound to travel 1cm at 20 degrees celcius
-const MICROSECDONDS_PER_CM = 1e6/34321;
+class Distance extends EventEmitter {
+  constructor() {
+    super();
+    this.trigger = new Gpio(23, { mode: Gpio.OUTPUT });
+    this.echo = new Gpio(24, { mode: Gpio.INPUT, alert: true });
+    this.trigger.digitalWrite(0);
+    this.triggerInterval = null;
+  }
 
-const trigger = new Gpio(23, {mode: Gpio.OUTPUT});
-const echo = new Gpio(24, {mode: Gpio.INPUT, alert: true});
+  watch() {
+    let startTick;
+    let lastDistance;
 
-trigger.digitalWrite(0); // Make sure trigger is low
+    this.echo.on("alert", (level, tick) => {
+      if (level == 1) {
+        startTick = tick;
+      } else {
+        const endTick = tick;
+        const diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
+        const distance = diff / 2 / Distance.MICROSECDONDS_PER_CM;
+        if (
+          lastDistance &&
+          distance < 60 &&
+          Math.abs(distance - lastDistance) > 5
+        ) {
+          this.emit("distance-changed", { distance, lastDistance });
+        }
+        lastDistance = distance;
+      }
+    });
+  }
 
-const watchHCSR04 = () => {
-  let startTick;
+  start() {
+    this.stop();
+    this.triggerInterval = setInterval(() => {
+      this.trigger.trigger(10, 1);
+    }, 500);
+  }
 
-  echo.on('alert', (level, tick) => {
-    if (level == 1) {
-      startTick = tick;
-    } else {
-      const endTick = tick;
-      const diff = (endTick >> 0) - (startTick >> 0); // Unsigned 32 bit arithmetic
-      console.log(diff / 2 / MICROSECDONDS_PER_CM);
+  stop() {
+    if (this.triggerInterval) {
+      clearInterval(this.triggerInterval);
+      this.triggerInterval = null;
     }
-  });
-};
+  }
+}
 
-watchHCSR04();
-
-// Trigger a distance measurement once per second
-setInterval(() => {
-  trigger.trigger(10, 1); // Set trigger high for 10 microseconds
-}, 1000);
+Distance.MICROSECDONDS_PER_CM = 1e6 / 34321;
+const distance = new Distance();
+module.exports = { distance };
