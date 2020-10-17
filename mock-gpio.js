@@ -14,6 +14,9 @@ class Gpio {
   digitalWrite(val) {
     console.log(`${this.pin} digital write ${val}`);
   }
+  pwmWrite(duty) {
+    console.log(`${this.pin} pwm write ${duty}`);
+  }
 }
 
 module.exports = { Gpio };

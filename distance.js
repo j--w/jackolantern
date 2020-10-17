@@ -26,10 +26,16 @@ class Distance extends EventEmitter {
         const distance = diff / 2 / Distance.MICROSECDONDS_PER_CM;
         if (
           lastDistance &&
-          distance < 60 &&
+          distance < 90 &&
           Math.abs(distance - lastDistance) > 5
         ) {
-          this.emit("distance-changed", { distance, lastDistance });
+          if (lastDistance >= 90) {
+            this.emit("enter-range", { distance, lastDistance });
+          } else {
+            this.emit("range-change", { distance, lastDistance });
+          }
+        } else if (lastDistance < 90 && distance >= 90) {
+          this.emit("leave-range", { distance, lastDistance });
         }
         lastDistance = distance;
       }
