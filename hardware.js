@@ -21,19 +21,23 @@ ws281x.configure({
   type: "grb",
 });
 
-function exitHandler() {
-  ws281x.reset();
-  [
-    process.env.GPIO_LED_STRIP,
-    process.env.GPIO_PUMP_IN_1,
-    process.env.GPIO_PUMP_IN_2,
-    process.env.GPIO_SONAR_TRIGGER,
-    process.env.GPIO_SONAR_ECHO,
-  ].forEach((pin) => {
-    const gpio = new Gpio(pin, { mode: Gpio.OUTPUT, alert: false });
-    gpio.digitalWrite(0);
-  });
-  return 1;
+function exitHandler(payload) {
+  if (payload !== 2) {
+    ws281x.turnOff();
+    ws281x.reset();
+    [
+      process.env.GPIO_LED_STRIP,
+      process.env.GPIO_PUMP_IN_1,
+      process.env.GPIO_PUMP_IN_2,
+      process.env.GPIO_SONAR_TRIGGER,
+      process.env.GPIO_SONAR_ECHO,
+    ].forEach((pin) => {
+      const gpio = new Gpio(pin, { mode: Gpio.OUTPUT, alert: false });
+      gpio.digitalWrite(0);
+    });
+    //  APparently nodemon doesn't properly quit unless it's code 2
+    process.exit(2);
+  }
 }
 
 process.on("exit", exitHandler.bind(null));

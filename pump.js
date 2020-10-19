@@ -2,7 +2,7 @@ const { Gpio } = require("./hardware");
 
 class Pump {
   constructor() {
-    this.in2 = new Gpio(process.env.GPIO_PUMP_IN_1, { mode: Gpio.OUTPUT });
+    this.in2 = new Gpio(process.env.GPIO_PUMP_IN_2, { mode: Gpio.OUTPUT });
     this.in1 = new Gpio(process.env.GPIO_PUMP_IN_1, { mode: Gpio.OUTPUT });
   }
 

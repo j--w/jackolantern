@@ -3,11 +3,11 @@ const { distance } = require("./distance");
 const { ledStrip } = require("./led-strip");
 const { pump } = require("./pump");
 const { gsap } = require("gsap");
-//ledStrip.animateFlame();
+//ledStrip.flickerFlame();
 // distance.on("distance-changed", (data) => {
 //   console.log(data);
 //   if (data.distance < data.lastDistance) {
-//     ledStrip.animateFlame();
+//     ledStrip.flickerFlame();
 //   }
 // });
 
@@ -17,38 +17,43 @@ function getPumpDutyCycle(distance) {
   );
 }
 
-// distance.on("enter-range", (data) => {
-//   console.log("ENTERED", data);
+distance.on("enter-range", (data) => {
+  console.log("ENTERED", data);
+  ledStrip.setActive().then(() => {
+    pump.turnOn(192);
+  });
+  //const dutyCycle = getPumpDutyCycle(data.distance);
+  //pump.turnOn(dutyCycle);
+  //ledStrip.variedGreen(dutyCycle);
+});
 
-//   const dutyCycle = getPumpDutyCycle(data.distance);
-//   pump.turnOn(dutyCycle);
-//   ledStrip.variedGreen(dutyCycle);
-// });
-
-// distance.on("leave-range", (data) => {
-//   console.log("LEFT", data);
-//   pump.turnOff();
-//   ledStrip.animateFlame();
-// });
+distance.on("leave-range", (data) => {
+  console.log("LEFT", data);
+  //pump.turnOff();
+  pump.turnOff();
+  ledStrip.flickerFlame();
+});
 
 // distance.on("range-change", (data) => {
-//   const dutyCycle = getPumpDutyCycle(data.distance);
-//   pump.turnOn(dutyCycle);
-//   ledStrip.variedGreen(dutyCycle);
+//   console.log("CHANGE", data);
+//   //const dutyCycle = getPumpDutyCycle(data.distance);
+//   //pump.turnOn(dutyCycle);
+//   //ledStrip.variedGreen(dutyCycle);
 // });
-// distance.watch();
-// distance.start();
+distance.watch();
+distance.start();
+ledStrip.flickerFlame();
 
-const runLoop = () => {
-  ledStrip.animateFlame();
-  pump.turnOff();
-  setTimeout(() => {
-    ledStrip.setFullGreen();
-    pump.turnOn(192);
-    setTimeout(() => {
-      runLoop();
-    }, 10000);
-  }, 10000);
-};
+// const runLoop = () => {
+//   ledStrip.flickerFlame();
+//   pump.turnOff();
+//   setTimeout(() => {
+//     ledStrip.setFullGreen();
+//     pump.turnOn(192);
+//     setTimeout(() => {
+//       runLoop();
+//     }, 10000);
+//   }, 10000);
+// };
 
-runLoop();
+// runLoop();

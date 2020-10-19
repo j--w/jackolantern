@@ -20,16 +20,14 @@ class LEDStrip {
     this.currentTween = null;
   }
 
-  getRandomFlameColor() {
-    return this.flameColors[
-      Math.floor(Math.random() * this.flameColors.length)
-    ];
+  getRandomColorFromList(colors = this.flameColors) {
+    return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  animateFlame() {
+  flickerFlame() {
     this.killTween();
     this.currentTween = gsap.to(this.pixels, 0.25, {
-      color: () => this.getRandomFlameColor(),
+      color: () => this.getRandomColorFromList(),
       repeat: -1,
       repeatRefresh: true,
       onComplete: () => {
@@ -38,10 +36,33 @@ class LEDStrip {
     });
   }
 
+  pulseGreen() {
+    this.killTween();
+    this.currentTween = gsap.to(this.pixels, 1, {
+      color: "#00FF00",
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
   variedGreen(dutyCycle) {
     this.killTween();
     this.currentTween = gsap.to(this.pixels, 0, {
       color: `rgb(0, ${dutyCycle}, 0)`,
+    });
+  }
+
+  setActive() {
+    return new Promise((resolve) => {
+      this.killTween();
+      this.currentTween = gsap.to(this.pixels, 2, {
+        color: "#000000",
+        ease: "quint.easeOut",
+        onComplete: () => {
+          this.pulseGreen();
+          resolve();
+        },
+      });
     });
   }
 
