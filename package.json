@@ -6,14 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "rsync -av --exclude node_modules --exclude .git . pi@192.168.0.14:~/pumpkin",
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "install:pi": "npm i rpi-ws281x pigpio",
-    "start:pi": "NODE_ENV=production node index.js"
+    "start:pi": "NODE_ENV=production nodemon index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "gsap": "^3.5.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.5"
+  }
 }

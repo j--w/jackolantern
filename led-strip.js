@@ -1,35 +1,19 @@
 const { gsap } = require("gsap");
-const ws281x =
-  process.env.NODE_ENV !== "production"
-    ? {
-        configure() {},
-        render(pixels) {
-          //console.log(pixels);
-        },
-      }
-    : require("rpi-ws281x");
+const { ws281x } = require("./hardware");
 
 class LEDStrip {
   constructor() {
-    ws281x.configure({
-      leds: 12,
-      dma: 12,
-      brightness: 255,
-      gpio: 18,
-      type: "grb",
-    });
-
     this.pixels = new Array(12)
       .fill()
       .map((item, index) => ({ index, color: "#FF0000" }));
 
     this.flameColors = [
-      "#860111",
-      "#ff4605",
-      "#ffd729",
-      "#f8a42f",
-      "#fa7900",
-      "#e71e02",
+      "#972207",
+      "#f88909",
+      "#0b0404",
+      "#faf015",
+      "#f56408",
+      "#000000",
     ];
     gsap.ticker.fps(24);
     gsap.ticker.add(this.draw.bind(this));
@@ -58,6 +42,20 @@ class LEDStrip {
     this.killTween();
     this.currentTween = gsap.to(this.pixels, 0, {
       color: `rgb(0, ${dutyCycle}, 0)`,
+    });
+  }
+
+  setFullGreen() {
+    this.killTween();
+    this.currentTween = gsap.to(this.pixels, 0.25, {
+      color: "#000000",
+      ease: "quint.easeOut",
+      onComplete: () => {
+        this.currentTween = gsap.to(this.pixels, 3, {
+          color: "rgb(0, 255, 0)",
+          ease: "quint.easeIn",
+        });
+      },
     });
   }
 

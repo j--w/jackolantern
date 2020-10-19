@@ -1,13 +1,9 @@
-console.log(process.env.NODE_ENV);
-const { Gpio } =
-  process.env.NODE_ENV !== "production"
-    ? require("./mock-gpio")
-    : require("pigpio");
+const { Gpio } = require("./hardware");
 
 class Pump {
   constructor() {
-    this.in1 = new Gpio(12, { mode: Gpio.OUTPUT });
-    this.in2 = new Gpio(13, { mode: Gpio.OUTPUT });
+    this.in2 = new Gpio(process.env.GPIO_PUMP_IN_1, { mode: Gpio.OUTPUT });
+    this.in1 = new Gpio(process.env.GPIO_PUMP_IN_1, { mode: Gpio.OUTPUT });
   }
 
   turnOn(dutyCycle) {

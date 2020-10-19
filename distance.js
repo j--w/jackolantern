@@ -1,14 +1,16 @@
-const { Gpio } =
-  process.env.NODE_ENV !== "production"
-    ? require("./mock-gpio")
-    : require("pigpio");
+const { Gpio } = require("./hardware");
 const EventEmitter = require("events");
 
 class Distance extends EventEmitter {
   constructor() {
     super();
-    this.trigger = new Gpio(23, { mode: Gpio.OUTPUT });
-    this.echo = new Gpio(24, { mode: Gpio.INPUT, alert: true });
+    this.trigger = new Gpio(process.env.GPIO_SONAR_TRIGGER, {
+      mode: Gpio.OUTPUT,
+    });
+    this.echo = new Gpio(process.env.GPIO_SONAR_ECHO, {
+      mode: Gpio.INPUT,
+      alert: true,
+    });
     this.trigger.digitalWrite(0);
     this.triggerInterval = null;
   }
