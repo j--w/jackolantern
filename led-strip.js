@@ -87,7 +87,6 @@ class LEDStrip {
 
   killTween() {
     if (this.currentTween) {
-      console.log("Kill tween");
       this.currentTween.kill();
       this.currentTween = null;
     }

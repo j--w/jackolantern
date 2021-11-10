@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "rsync -av --exclude node_modules --exclude .git . pi@192.168.0.14:~/pumpkin",
+    "deploy": "rsync -av --exclude node_modules --exclude .git . pi@192.168.68.111:~/pumpkin",
     "start": "nodemon index.js",
     "install:pi": "npm i rpi-ws281x pigpio",
     "start:pi": "NODE_ENV=production nodemon index.js"

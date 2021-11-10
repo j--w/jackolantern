@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { distance } = require("./distance");
+// const { distance } = require("./distance");
 const { ledStrip } = require("./led-strip");
 const { pump } = require("./pump");
 const { gsap } = require("gsap");
@@ -17,22 +17,24 @@ function getPumpDutyCycle(distance) {
   );
 }
 
-distance.on("enter-range", (data) => {
-  console.log("ENTERED", data);
-  ledStrip.setActive().then(() => {
-    pump.turnOn(192);
-  });
-  //const dutyCycle = getPumpDutyCycle(data.distance);
-  //pump.turnOn(dutyCycle);
-  //ledStrip.variedGreen(dutyCycle);
-});
 
-distance.on("leave-range", (data) => {
-  console.log("LEFT", data);
-  //pump.turnOff();
-  pump.turnOff();
-  ledStrip.flickerFlame();
-});
+
+// distance.on("enter-range", (data) => {
+//   console.log("ENTERED", data);
+//   ledStrip.setActive().then(() => {
+//     pump.turnOn(192);
+//   });
+//   //const dutyCycle = getPumpDutyCycle(data.distance);
+//   //pump.turnOn(dutyCycle);
+//   //ledStrip.variedGreen(dutyCycle);
+// });
+
+// distance.on("leave-range", (data) => {
+//   console.log("LEFT", data);
+//   //pump.turnOff();
+//   pump.turnOff();
+//   ledStrip.flickerFlame();
+// });
 
 // distance.on("range-change", (data) => {
 //   console.log("CHANGE", data);
@@ -40,9 +42,25 @@ distance.on("leave-range", (data) => {
 //   //pump.turnOn(dutyCycle);
 //   //ledStrip.variedGreen(dutyCycle);
 // });
-distance.watch();
-distance.start();
-ledStrip.flickerFlame();
+// distance.watch();
+// distance.start();
+
+function resetCycle() {
+  console.log("reset");
+  pump.turnOff();
+  ledStrip.flickerFlame();
+  setTimeout(() => {
+    console.log("set active");
+      ledStrip.setActive().then(() => {
+        console.log("turn on pump")
+        pump.turnOn(255);
+        setTimeout(() => {
+          resetCycle();
+        }, 10000);
+      });
+  }, 60000);
+}
+resetCycle();
 
 // const runLoop = () => {
 //   ledStrip.flickerFlame();
